@@ -1,6 +1,7 @@
 package lucida.main;
 
 // Thrift java libraries 
+
 import org.apache.thrift.server.TNonblockingServer;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TNonblockingServerSocket;
@@ -30,22 +31,23 @@ import lucida.handler.QAServiceHandler.AsyncQAServiceHandler;
  * Starts the question-answer server and listens for requests.
  */
 public class QADaemon {
-	/** 
-	 * Entry point for question-answer.
-	 * @param args the argument list. Provide port numbers
-	 * for both sirius and qa.
-	 */
-	public static void main(String [] args) 
-			throws TTransportException, IOException, InterruptedException {	
-		TProcessor proc = new LucidaService.AsyncProcessor(
-				new QAServiceHandler.AsyncQAServiceHandler());
-		TNonblockingServerTransport transport = new TNonblockingServerSocket(8083);
-		TThreadedSelectorServer.Args arguments = new TThreadedSelectorServer.Args(transport)
-		.processor(proc)	
-		.protocolFactory(new TBinaryProtocol.Factory())
-		.transportFactory(new TFramedTransport.Factory());
-		final TThreadedSelectorServer server = new TThreadedSelectorServer(arguments);
-		System.out.println("QA at port 8083");
-		server.serve();
-	}
+    /**
+     * Entry point for question-answer.
+     *
+     * @param args the argument list. Provide port numbers
+     *             for both sirius and qa.
+     */
+    public static void main(String[] args)
+            throws TTransportException, IOException, InterruptedException {
+        TProcessor proc = new LucidaService.AsyncProcessor(
+                new QAServiceHandler.AsyncQAServiceHandler());
+        TNonblockingServerTransport transport = new TNonblockingServerSocket(8083);
+        TThreadedSelectorServer.Args arguments = new TThreadedSelectorServer.Args(transport)
+                .processor(proc)
+                .protocolFactory(new TBinaryProtocol.Factory())
+                .transportFactory(new TFramedTransport.Factory());
+        final TThreadedSelectorServer server = new TThreadedSelectorServer(arguments);
+        System.out.println("QA at port 8083");
+        server.serve();
+    }
 }

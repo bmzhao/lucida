@@ -22,7 +22,7 @@ import edu.cmu.minorthird.classify.MutableInstance;
 
 /**
  * A rule used for rule-based classification of answer type.
- * 
+ *
  * @author Justin Betteridge
  * @version 2008-02-10
  */
@@ -31,40 +31,41 @@ public class Rule {
     private String atype;
     private double confidence;
     private List<RuleElement> elements;
-    
+
     /**
-     * Instantiates a Rule object from an XML Element.  
+     * Instantiates a Rule object from an XML Element.
+     *
      * @param ruleElement the Element to construct a Rule from
      */
-    public Rule (Element ruleElement) {
+    public Rule(Element ruleElement) {
         NamedNodeMap ruleAttributes = ruleElement.getAttributes();
         this.atype = ruleAttributes.getNamedItem("atype").getNodeValue().toString();
         this.confidence = Double.parseDouble(ruleAttributes.getNamedItem("conf").getNodeValue().toString());
-        
+
         this.elements = new ArrayList<RuleElement>();
         NodeList ruleElementList = ruleElement.getChildNodes();
         for (int j = 0; j < ruleElementList.getLength(); j++) {
             Node ruleElementElement = ruleElementList.item(j);
             if (!ruleElementElement.getNodeName().equals("RULE_ELEMENT")) continue;
-            elements.add(new RuleElement((Element)ruleElementElement));
+            elements.add(new RuleElement((Element) ruleElementElement));
         }
     }
-    
+
 
     /**
      * Tells whether a given Instance matches this Rule by returning
-     * the appropriate answer type if it does match, and <code>null</code> 
+     * the appropriate answer type if it does match, and <code>null</code>
      * if it does not.
-     * 
+     *
      * @param instance the Instance to consider
      * @return the answer type and subtype formed by matching this Rule to the
      * given Instance, or <code>null</code> if this Rule does not match the Instance.
      * @throws IllegalStateException if this Rule has not been compiled yet
      */
-    public AnswerType matches (Instance instance) {
-        if (elements == null) 
+    public AnswerType matches(Instance instance) {
+        if (elements == null)
             throw new IllegalStateException("Must compile rule before using it");
-        
+
         String retAtype = atype;
         AnswerType res = null;
         // All elements of the rule must match in order for the rule to match
@@ -82,7 +83,7 @@ public class Rule {
         res.setConfidence(confidence);
         return res;
     }
-        
+
     /**
      * @param atype the atype to set
      */
@@ -115,24 +116,24 @@ public class Rule {
         }
         return sb.toString();
     }
-    
+
     /**
      * Tests Rule creation, compilation and matching.
-     * 
+     *
      * @param args
      */
     public static void main(String[] args) {
         String test = "<RULE atype=\"TEST_TYPE\">" +
-                        "<RULE_ELEMENT feature_name=\"TEST_FEATURE1\">" +    
-                            "<FEATURE_VALUE>value1</FEATURE_VALUE>" +
-                            "<FEATURE_VALUE>value2</FEATURE_VALUE>" +
-                            "<FEATURE_VALUE>value3</FEATURE_VALUE>" +
-                        "</RULE_ELEMENT>" +
-                        "<RULE_ELEMENT feature_name=\"FOCUS_TYPE\">" +    
-                            "<FEATURE_VALUE>value3=</FEATURE_VALUE>" +
-                            "<FEATURE_VALUE>value4=new</FEATURE_VALUE>" +
-                        "</RULE_ELEMENT>" +    
-                      "</RULE>";    
+                "<RULE_ELEMENT feature_name=\"TEST_FEATURE1\">" +
+                "<FEATURE_VALUE>value1</FEATURE_VALUE>" +
+                "<FEATURE_VALUE>value2</FEATURE_VALUE>" +
+                "<FEATURE_VALUE>value3</FEATURE_VALUE>" +
+                "</RULE_ELEMENT>" +
+                "<RULE_ELEMENT feature_name=\"FOCUS_TYPE\">" +
+                "<FEATURE_VALUE>value3=</FEATURE_VALUE>" +
+                "<FEATURE_VALUE>value4=new</FEATURE_VALUE>" +
+                "</RULE_ELEMENT>" +
+                "</RULE>";
         Document ruleDocument;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -145,7 +146,7 @@ public class Rule {
             Rule r = new Rule(ruleDocument.getDocumentElement());
             System.out.println("Test input: " + test);
             System.out.println(r.toString());
-            
+
             MutableInstance testInstance = new MutableInstance(test);
             testInstance.addBinary(new Feature("TEST_FEATURE1.value1"));
             testInstance.addBinary(new Feature("FOCUS_TYPE.value4"));
