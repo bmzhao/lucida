@@ -5,9 +5,15 @@ thrift:
 	@if [ ! -d "src/lucida/thrift" ]; then \
        thrift --gen java ../../lucidaservice.thrift; \
        thrift --gen java ../../lucidatypes.thrift; \
-       sed -i '1s/^/package lucida.thrift;\n/' gen-java/LucidaService.java; \
-       sed -i '1s/^/package lucida.thrift;\n/' gen-java/QueryInput.java; \
-       sed -i '1s/^/package lucida.thrift;\n/' gen-java/QuerySpec.java; \
+       if [[ "$$OSTYPE" == "darwin"* ]]; then \
+           sed -i '' '1s/^/package lucida.thrift;/' gen-java/LucidaService.java; \
+           sed -i '' '1s/^/package lucida.thrift;/' gen-java/QueryInput.java; \
+           sed -i '' '1s/^/package lucida.thrift;/' gen-java/QuerySpec.java; \
+       else \
+           sed -i '1s/^/package lucida.thrift;\n/' gen-java/LucidaService.java; \
+           sed -i '1s/^/package lucida.thrift;\n/' gen-java/QueryInput.java; \
+           sed -i '1s/^/package lucida.thrift;\n/' gen-java/QuerySpec.java; \
+       fi; \
        mkdir src/lucida/thrift/; \
        mv gen-java/* src/lucida/thrift/; \
        rmdir gen-java/; \

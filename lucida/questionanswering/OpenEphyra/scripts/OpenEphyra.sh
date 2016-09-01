@@ -14,5 +14,5 @@ export CLASSPATH=bin:lib/ml/maxent.jar:lib/ml/minorthird.jar:lib/nlp/jwnl.jar:li
 export INDRI_INDEX=$HOME/projects/umvoice/wiki_indri_index/
 
 cd ..
-
+#-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005
 java -Djava.library.path=lib/search/ -server -Xms1024m -Xmx2048m info.ephyra.OpenEphyra "$*"
