@@ -65,7 +65,7 @@ public class OpenEphyra {
     /**
      * Maximum number of factoid answers.
      */
-    protected static final int FACTOID_MAX_ANSWERS = 1;
+    protected static final int FACTOID_MAX_ANSWERS = 20;
     /**
      * Absolute threshold for factoid answer scores.
      */
@@ -112,7 +112,8 @@ public class OpenEphyra {
         Logger.enableLogging(true);
 
         // initialize Ephyra and start command line interface
-        (new OpenEphyra()).commandLine(args[0].trim());
+//        (new OpenEphyra()).commandLine(args[0].trim());
+        (new OpenEphyra()).repl();
     }
 
     /**
@@ -405,6 +406,53 @@ public class OpenEphyra {
         //}
     }
 
+
+    public void repl() {
+        while (true) {
+            // query user for question, quit if user types in "exit"
+			MsgPrinter.printQuestionPrompt();
+			String question = readLine().trim();
+
+            if (question.equalsIgnoreCase("exit")) System.exit(0);
+
+            // determine question type and extract question string
+            String type;
+            if (question.matches("(?i)" + FACTOID + ":.*+")) {
+                // factoid question
+                type = FACTOID;
+                question = question.split(":", 2)[1].trim();
+            } else if (question.matches("(?i)" + LIST + ":.*+")) {
+                // list question
+                type = LIST;
+                question = question.split(":", 2)[1].trim();
+            } else {
+                // question type unspecified
+                type = FACTOID;  // default type
+            }
+
+            // ask question
+            Result[] results = new Result[0];
+            if (type.equals(FACTOID)) {
+                Logger.logFactoidStart(question);
+                try {
+                    results = askFactoidWiki(question);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Logger.logResults(results);
+                Logger.logFactoidEnd();
+            } else if (type.equals(LIST)) {
+                Logger.logListStart(question);
+                results = askList(question, LIST_REL_THRESH);
+                Logger.logResults(results);
+                Logger.logListEnd();
+            }
+
+            // print answers
+            MsgPrinter.printAnswers(results);
+            }
+    }
+
     /**
      * Asks Ephyra a factoid question and returns up to <code>maxAnswers</code>
      * results that have a score of at least <code>absThresh</code>.
@@ -441,6 +489,26 @@ public class OpenEphyra {
 
         return (results.length > 0) ? results[0] : null;
     }
+
+
+    /**
+     * Forwards the client's question to the OpenEphyra object's askFactoid
+     * method and collects the response.
+     *
+     * @param question eg. "what is the speed of light?"
+     * @throws Exception
+     */
+    private Result[] askFactoidWiki(String question) throws Exception {
+        MsgPrinter.printStatusMsg("askFactoidWiki(): Arg = " + question);
+        // Check if Wikipedia Indri repository is pre-configured.
+        String wiki_indri_index = System.getenv("wiki_indri_index");
+        if (wiki_indri_index != null) {
+            // Set INDRI_INDEX.
+            System.setProperty("INDRI_INDEX", wiki_indri_index);
+        }
+        return askFactoid(question, FACTOID_MAX_ANSWERS, FACTOID_ABS_THRESH);
+    }
+
 
     /**
      * Asks Ephyra a list question and returns results that have a score of at
